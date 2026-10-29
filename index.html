@@ -68,6 +68,24 @@
       background: var(--bg-alt); border-bottom: 1px solid var(--border); padding: 1.5rem 5%;
       flex-direction: column; gap: 1.25rem;
     }
+    .nav-drop { position: relative; }
+    .nav-drop > button {
+      background: none; border: 0; padding: 0; font: inherit; font-weight: 500; font-size: .95rem; color: var(--muted);
+      cursor: pointer; display: inline-flex; align-items: center; gap: .3rem; transition: color .2s;
+    }
+    .nav-drop > button::after { content: ""; width: .4rem; height: .4rem; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg) translateY(-2px); }
+    .nav-drop:hover > button, .nav-drop:focus-within > button { color: var(--white); }
+    .nav-drop-menu {
+      display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); min-width: 190px;
+      padding: .5rem; margin: 0; list-style: none; background: var(--bg-alt); border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+    .nav-drop-menu::before { content: ""; position: absolute; top: -12px; left: 0; right: 0; height: 12px; }
+    .nav-drop:hover .nav-drop-menu, .nav-drop:focus-within .nav-drop-menu { display: block; }
+    .nav-drop-menu a { display: block; padding: .55rem .8rem; border-radius: 8px; white-space: nowrap; }
+    .nav-drop-menu a:hover { background: rgba(255,255,255,.06); }
+    .nav-mobile-group { display: flex; flex-direction: column; gap: .9rem; padding-left: .9rem; border-left: 2px solid var(--border); }
+    .nav-mobile-label { color: var(--muted); font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     .nav-mobile.open { display: flex; }
     .nav-mobile a { text-decoration: none; color: var(--white); font-weight: 500; }
 
@@ -277,6 +295,14 @@
       <li><a href="#shop">Shop</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#contact">Contact</a></li>
+      <li class="nav-drop">
+        <button type="button" aria-haspopup="true">App support</button>
+        <ul class="nav-drop-menu">
+          <li><a href="/app/support/">Support</a></li>
+          <li><a href="/app/privacy/">Privacy policy</a></li>
+          <li><a href="/app/terms/">Terms of use</a></li>
+        </ul>
+      </li>
       <li>
         <a class="nav-cta" href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.45 12 20.45 12 20.45s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z"/></svg>
@@ -292,6 +318,12 @@
     <a href="#shop">Shop</a>
     <a href="#about">About</a>
     <a href="#contact">Contact</a>
+    <span class="nav-mobile-label">App support</span>
+    <div class="nav-mobile-group">
+      <a href="/app/support/">Support</a>
+      <a href="/app/privacy/">Privacy policy</a>
+      <a href="/app/terms/">Terms of use</a>
+    </div>
     <a href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a>
   </div>
 </nav>

@@ -457,8 +457,61 @@
         transition-delay: calc(var(--i, 0) * 70ms);
       }
       .motion [data-reveal].in { opacity: 1; transform: none; }
-      .motion .short-card.pop { animation: pop .45s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 45ms); }
-      @keyframes pop { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+    }
+
+    /* ══ TOPIC COLOURS ═════════════════════════════════════════
+       Each drug class has its own colour on its filter pill, card tag and
+       hover glow; lime stays the brand colour for buttons and the nav.
+       Every topic colour is 6:1+ as text on the graphite cards, and filled
+       pills use near-black text (7:1+). */
+    :root {
+      --t-cardio: #FF7A6B; --t-antibiotics: #3DD9EB; --t-metabolic: #FFB627;
+      --t-neuro: #B49BFF; --t-mental: #FF6FB5; --t-more: var(--accent); --t-leadership: #6CB4FF;
+    }
+    [data-topic="cardio"], [data-filter="cardio"] { --tc: var(--t-cardio); }
+    [data-topic="antibiotics"], [data-filter="antibiotics"] { --tc: var(--t-antibiotics); }
+    [data-topic="metabolic"], [data-filter="metabolic"] { --tc: var(--t-metabolic); }
+    [data-topic="neuro"], [data-filter="neuro"] { --tc: var(--t-neuro); }
+    [data-topic="mental"], [data-filter="mental"] { --tc: var(--t-mental); }
+    [data-topic="more"], [data-filter="more"] { --tc: var(--t-more); }
+    [data-topic="leadership"] { --tc: var(--t-leadership); }
+
+    [data-topic] .chip-accent { color: var(--tc); background: color-mix(in srgb, var(--tc) 12%, transparent); border-color: color-mix(in srgb, var(--tc) 38%, transparent); }
+    .short-card[data-topic]:hover { border-color: color-mix(in srgb, var(--tc) 60%, transparent); box-shadow: 0 18px 50px color-mix(in srgb, var(--tc) 20%, transparent); }
+    .short-card[data-topic]::after { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%), color-mix(in srgb, var(--tc) 18%, transparent), transparent 65%); }
+    .short-card[data-topic] .short-caption { transition: color .25s; }
+    .short-card[data-topic]:hover .short-caption { color: var(--white); }
+
+    .pill[data-filter]:not([data-filter="all"])::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); flex-shrink: 0; }
+    .pill[data-filter]:not([data-filter="all"]):hover { border-color: var(--tc); }
+    .pill[data-filter]:not([data-filter="all"])[aria-pressed="true"] { background: var(--tc); border-color: var(--tc); color: var(--dark-text); }
+    .pill[data-filter]:not([data-filter="all"])[aria-pressed="true"]::before { background: var(--dark-text); }
+
+    /* Hero: the headline word and phone glow carry the whole topic spectrum */
+    .hero-text h1 .gradient-text {
+      background: linear-gradient(90deg, var(--t-antibiotics), var(--t-neuro) 30%, var(--t-mental) 55%, var(--t-cardio) 78%, var(--t-metabolic));
+      -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none;
+    }
+    .hero-text h1 .gradient-text::after { background: linear-gradient(90deg, var(--t-antibiotics), var(--t-neuro), var(--t-mental), var(--t-cardio), var(--t-metabolic)); }
+    #hero {
+      background:
+        radial-gradient(ellipse 45% 40% at 8% 12%, rgba(180,155,255,.16), transparent 70%),
+        radial-gradient(ellipse 40% 35% at 95% 20%, rgba(255,122,107,.12), transparent 70%),
+        radial-gradient(ellipse 70% 55% at 50% 115%, rgba(198,255,61,.18) 0%, rgba(198,255,61,.05) 45%, transparent 70%),
+        var(--bg);
+    }
+    .phone-glow { background: conic-gradient(from 0deg, var(--t-cardio), var(--t-metabolic), var(--accent), var(--t-antibiotics), var(--t-neuro), var(--t-mental), var(--t-cardio)); opacity: .42; border-radius: 50%; }
+
+    /* Marquee dots cycle through the topic colours */
+    .marquee-track li:nth-child(5n+1)::before { background: var(--t-cardio); }
+    .marquee-track li:nth-child(5n+2)::before { background: var(--t-antibiotics); }
+    .marquee-track li:nth-child(5n+3)::before { background: var(--t-metabolic); }
+    .marquee-track li:nth-child(5n+4)::before { background: var(--t-neuro); }
+    .marquee-track li:nth-child(5n)::before { background: var(--t-mental); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .motion .phone-glow { animation: spectrum 24s linear infinite; }
+      @keyframes spectrum { to { transform: rotate(360deg); } }
     }
   </style>
   <script>
@@ -780,7 +833,7 @@
     const el = document.getElementById(containerId);
     el.innerHTML = videos.map(v => {
       const ep = v.title.match(/^Episode (\d+)\s*·\s*/);
-      const topic = fixedTag ? { key: 'all', label: fixedTag } : topicFor(v.title);
+      const topic = fixedTag ? { key: fixedTag.toLowerCase(), label: fixedTag } : topicFor(v.title);
       return `
       <div class="short-card" data-topic="${topic.key}">
         <div class="short-video">
@@ -809,24 +862,48 @@
       <button type="button" class="pill" data-filter="${t.key}" aria-pressed="${t.key === 'all'}">
         ${t.label}<span class="pill-count">${t.key === 'all' ? cards.length : counts[t.key]}</span>
       </button>`).join('');
+    // Gliding filter (FLIP): leaving cards fade out, staying cards slide to
+    // their new slot, arriving cards fade in. Cards are hidden, never removed,
+    // so the YouTube embeds don't reload on every click.
+    const ease = 'cubic-bezier(.2,.8,.2,1)';
+    let run = 0;
     wrap.addEventListener('click', e => {
       const btn = e.target.closest('.pill');
       if (!btn) return;
       const key = btn.dataset.filter;
+      const matches = card => key === 'all' || card.dataset.topic === key;
+      const glide = document.documentElement.classList.contains('motion') && 'animate' in Element.prototype;
+      const token = ++run;
       wrap.querySelectorAll('.pill').forEach(p => p.setAttribute('aria-pressed', p === btn));
-      let shown = 0;
-      cards.forEach(card => {
-        const match = key === 'all' || card.dataset.topic === key;
-        card.hidden = !match;
-        card.classList.remove('pop');
-        if (match) {
-          card.removeAttribute('data-reveal');
-          card.style.setProperty('--i', shown++);
-          void card.offsetWidth; // restart the pop animation
-          card.classList.add('pop');
-        }
-      });
-      status.textContent = `Showing ${shown} of ${cards.length} explainers`;
+      cards.forEach(card => card.getAnimations().forEach(a => a.cancel()));
+      const before = new Map(cards.filter(c => !c.hidden).map(c => [c, c.getBoundingClientRect()]));
+      const leaving = glide ? cards.filter(c => !c.hidden && !matches(c)) : [];
+
+      const apply = () => {
+        if (token !== run) return; // a newer click took over
+        let arriving = 0;
+        cards.forEach(card => {
+          card.hidden = !matches(card);
+          if (!card.hidden) card.removeAttribute('data-reveal');
+        });
+        const shown = cards.filter(c => !c.hidden);
+        status.textContent = `Showing ${shown.length} of ${cards.length} explainers`;
+        if (!glide) return;
+        shown.forEach(card => {
+          const from = before.get(card), to = card.getBoundingClientRect();
+          if (from) {
+            const dx = from.left - to.left, dy = from.top - to.top;
+            if (dx || dy) card.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 480, easing: ease });
+          } else {
+            card.animate([{ opacity: 0, transform: 'translateY(12px) scale(.95)' }, { opacity: 1, transform: 'none' }],
+              { duration: 380, delay: 60 * arriving++, easing: ease, fill: 'backwards' });
+          }
+        });
+      };
+      if (leaving.length) {
+        Promise.all(leaving.map(c => c.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.94)' }],
+          { duration: 170, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {}))).then(apply);
+      } else apply();
     });
   }
   renderFilters();

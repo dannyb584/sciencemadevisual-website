@@ -569,7 +569,16 @@
     .hero-pills svg { position: absolute; left: var(--x); top: var(--y); width: var(--w); height: auto; overflow: visible;
       transform: rotate(var(--r)); filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); opacity: .92; }
     @media (max-width: 1500px) { .hero-pills svg { opacity: .55; } }
-    @media (max-width: 900px) { .hero-pills svg:nth-child(n+6) { display: none; } .hero-pills svg { opacity: .35; } }
+    /* Live mode: script positions the pills, they can be grabbed and thrown */
+    .hero-pills.live svg { left: 0; top: 0; animation: none !important; pointer-events: auto; cursor: grab; touch-action: none; user-select: none; will-change: transform; }
+    .hero-pills.live svg.held { cursor: grabbing; filter: drop-shadow(0 18px 26px rgba(0,0,0,.45)); opacity: 1; }
+    .hero-pills.grabbing { z-index: 2; }
+    /* Let clicks fall through the hero text to the pills; links, buttons and the video still work */
+    .hero-pills.live ~ .hero-inner { pointer-events: none; }
+    .hero-pills.live ~ .hero-inner :is(a, button, iframe, .hero-preview) { pointer-events: auto; }
+    /* On touch screens pills don't catch touches, so swiping still scrolls the page */
+    @media (pointer: coarse) { .hero-pills.live svg { pointer-events: none; } }
+    @media (max-width: 900px) { .hero-pills svg:nth-child(n+9) { display: none; } .hero-pills svg { opacity: .4; } }
     @media (prefers-reduced-motion: no-preference) {
       .motion .hero-pills svg { animation: pill-float var(--t) ease-in-out infinite alternate; animation-delay: var(--dl); }
       @keyframes pill-float {
@@ -1057,17 +1066,99 @@
     // [kind, colour, left, top, width, rotation, seconds]
     const PILLS = [
       ['c', '--t-cardio',      '3%',  '16%', '88px', -25, 9],
-      ['t', '--t-metabolic',   '13%', '9%',  '34px',   0, 11],
-      ['c', '--t-antibiotics', '9%',  '38%', '120px', 18, 12],
-      ['t', '--t-mental',      '2%',  '58%', '42px',   0, 10],
-      ['c', '--t-neuro',       '15%', '66%', '76px', -40, 13],
-      ['c', '--t-mental',      '4%',  '82%', '64px',  30, 10],
-      ['t', '--t-antibiotics', '19%', '28%', '26px',   0, 8],
-      ['c', '--t-metabolic',   '21%', '84%', '58px', -12, 14],
-      ['t', '--t-leadership',  '23%', '52%', '30px',   0, 9]
+      ['t', '--t-metabolic',   '13%', '8%',  '34px',   0, 11],
+      ['c', '--t-antibiotics', '8%',  '40%', '116px', 18, 12],
+      ['t', '--t-mental',      '2%',  '62%', '42px',   0, 10],
+      ['c', '--t-neuro',       '16%', '74%', '76px', -40, 13],
+      ['c', '--t-mental',      '30%', '88%', '64px',  30, 10],
+      ['t', '--t-antibiotics', '34%', '6%',  '28px',   0, 8],
+      ['c', '--t-metabolic',   '46%', '82%', '58px', -12, 14],
+      ['t', '--t-leadership',  '52%', '12%', '32px',   0, 9],
+      ['c', '--t-leadership',  '58%', '90%', '70px',  22, 11],
+      ['c', '--t-cardio',      '88%', '10%', '84px', -18, 12],
+      ['t', '--t-neuro',       '94%', '34%', '36px',   0, 9],
+      ['c', '--t-antibiotics', '90%', '62%', '96px',  35, 13],
+      ['t', '--t-cardio',      '82%', '86%', '30px',   0, 10],
+      ['c', '--t-mental',      '70%', '4%',  '54px', -30, 11]
     ];
     box.innerHTML = PILLS.map(([k, c, x, y, w, r, t], i) =>
       `<svg viewBox="${k === 'c' ? '0 0 44 18' : '0 0 20 20'}" style="--x:${x};--y:${y};--w:${w};--r:${r}deg;--t:${t}s;--dl:${-i * 1.3}s;--dx:${8 + (i % 3) * 6}px;--dy:${10 + (i % 4) * 5}px">${k === 'c' ? capsule(c) : tablet(c)}</svg>`).join('');
+
+    // Live pills: the mouse pushes them away, and they can be grabbed and
+    // thrown. They glide, bounce off the hero's edges and drift home.
+    if (!motion) return;
+    const hero = document.getElementById('hero');
+    const els = [...box.children];
+    const TOP = 84; // keep clear of the fixed nav bar
+    let W = 0, H = 0, running = false, ptr = null;
+    const P = els.map((el, i) => {
+      const [, , x, y, , r] = PILLS[i];
+      return { el, hx: parseFloat(x) / 100, hy: parseFloat(y) / 100, x: 0, y: 0, vx: 0, vy: 0, a: r, va: 0, w: 0, h: 0, held: false, t: i * 1.3 };
+    });
+    const measure = () => {
+      const fresh = !W;
+      W = box.clientWidth; H = box.clientHeight;
+      P.forEach(p => { p.w = p.el.getBoundingClientRect().width; p.h = p.el.getBoundingClientRect().height;
+        if (fresh) { p.x = p.hx * W; p.y = Math.max(TOP, p.hy * H); } });
+    };
+    box.classList.add('live');
+    measure();
+    addEventListener('resize', measure);
+
+    // Pointer tracking (position + velocity) anywhere over the hero
+    const track = e => {
+      const r = box.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, now = performance.now();
+      if (ptr && now > ptr.t) { const dt = now - ptr.t; ptr.vx = (x - ptr.x) / dt * 16; ptr.vy = (y - ptr.y) / dt * 16; }
+      ptr = { x, y, t: now, vx: ptr ? ptr.vx : 0, vy: ptr ? ptr.vy : 0 };
+    };
+    hero.addEventListener('pointermove', track, { passive: true });
+    hero.addEventListener('pointerleave', () => { ptr = null; });
+
+    // Grab and throw
+    els.forEach((el, i) => el.addEventListener('pointerdown', e => {
+      const p = P[i];
+      e.preventDefault(); el.setPointerCapture(e.pointerId); track(e);
+      p.held = { dx: ptr.x - p.x, dy: ptr.y - p.y }; p.vx = p.vy = 0;
+      box.classList.add('grabbing'); el.classList.add('held');
+      const move = ev => { track(ev); p.x = ptr.x - p.held.dx; p.y = ptr.y - p.held.dy; };
+      const drop = () => {
+        const cap = 38;
+        p.vx = Math.max(-cap, Math.min(cap, ptr ? ptr.vx : 0)); p.vy = Math.max(-cap, Math.min(cap, ptr ? ptr.vy : 0));
+        p.va = p.vx * .6; p.held = false;
+        box.classList.remove('grabbing'); el.classList.remove('held');
+        el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', drop); el.removeEventListener('pointercancel', drop);
+      };
+      el.addEventListener('pointermove', move); el.addEventListener('pointerup', drop); el.addEventListener('pointercancel', drop);
+    }));
+
+    const step = () => {
+      if (!running) return;
+      P.forEach(p => {
+        if (!p.held) {
+          if (ptr) { // a moving pointer nudges nearby pills; a still one lets you grab them
+            const cx = p.x + p.w / 2, cy = p.y + p.h / 2, dx = cx - ptr.x, dy = cy - ptr.y, d = Math.hypot(dx, dy) || 1, R = 70 + p.w / 2;
+            const speed = Math.min(Math.hypot(ptr.vx, ptr.vy), 30);
+            if (d < R && speed > 1.5) {
+              const f = (R - d) / R;
+              p.vx += (dx / d * speed * .12 + ptr.vx * .18) * f; p.vy += (dy / d * speed * .12 + ptr.vy * .18) * f;
+              p.va += (dx > 0 ? 1 : -1) * f * speed * .25;
+            }
+          }
+          const sp = Math.hypot(p.vx, p.vy);
+          if (sp < 2) { p.vx += (p.hx * W - p.x) * .0009; p.vy += (Math.max(TOP, p.hy * H) - p.y) * .0009; } // drift home when calm
+          p.t += .016; p.vy += Math.sin(p.t) * .015; // gentle bob
+          p.vx *= .965; p.vy *= .965; p.va *= .95;
+          p.x += p.vx; p.y += p.vy; p.a += p.va;
+          if (p.x < 0) { p.x = 0; p.vx = Math.abs(p.vx) * .7; } else if (p.x > W - p.w) { p.x = W - p.w; p.vx = -Math.abs(p.vx) * .7; }
+          if (p.y < TOP) { p.y = TOP; p.vy = Math.abs(p.vy) * .7; } else if (p.y > H - p.h) { p.y = H - p.h; p.vy = -Math.abs(p.vy) * .7; }
+        }
+        p.el.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.a}deg)${p.held ? ' scale(1.15)' : ''}`;
+      });
+      if (ptr) { ptr.vx *= .8; ptr.vy *= .8; }
+      requestAnimationFrame(step);
+    };
+    // Only animate while the hero is on screen
+    new IntersectionObserver(([e]) => { const was = running; running = e.isIntersecting; if (running && !was) requestAnimationFrame(step); }).observe(hero);
   })();
 
   // Episode counter: total comes from SERIES, counts up once on load

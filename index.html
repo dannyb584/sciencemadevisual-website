@@ -540,6 +540,10 @@
       .motion .phone-glow { animation: spectrum 24s linear infinite; }
       @keyframes spectrum { to { transform: rotate(360deg); } }
     }
+    /* YouTube buttons: YouTube red with the white play logo (#E00000 keeps white text at AA) */
+    .btn-youtube, .nav-cta.btn-youtube, #subscribe-cta .btn-youtube { background: #E00000; color: #fff !important; border-color: transparent; }
+    .btn-youtube svg, .nav-cta.btn-youtube svg { width: 22px; height: 22px; fill: #fff; }
+    .btn-youtube:hover, .nav-cta.btn-youtube:hover { background: #C40000; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(224,0,0,.35); }
   </style>
   <script>
     // Opt into motion before first paint so revealed content never flashes.
@@ -567,7 +571,7 @@
         </ul>
       </li>
       <li>
-        <a class="nav-cta" href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">
+        <a class="nav-cta btn-youtube" href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.45 12 20.45 12 20.45s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z"/></svg>
           Subscribe
         </a>
@@ -601,7 +605,7 @@
       <h1>Science, made <span class="gradient-text">visual.</span></h1>
       <p class="lead">Complex medications and healthcare topics, animated into short, accurate explainers (max 3 minutes) — the receptors, channels and pathways behind your prescriptions, made clear.</p>
       <div class="hero-buttons">
-        <a class="btn btn-primary" href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">
+        <a class="btn btn-youtube" href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.45 12 20.45 12 20.45s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z"/></svg>
           Subscribe on YouTube
         </a>
@@ -791,7 +795,7 @@
     <h2>Never blank on a mechanism again.</h2>
     <p>New pharmacology and leadership explainers land regularly — on YouTube and TikTok. Follow so you don't miss the next one.</p>
     <div class="cta-buttons">
-      <a class="btn btn-primary" href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">
+      <a class="btn btn-youtube" href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.45 12 20.45 12 20.45s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z"/></svg>
         Subscribe on YouTube
       </a>
@@ -1106,8 +1110,17 @@
   addEventListener('resize', () => currentSection && setActive(currentSection));
   document.fonts && document.fonts.ready.then(() => currentSection && setActive(currentSection));
 </script>
-<!-- TikTok embed renderer -->
-<script async src="https://www.tiktok.com/embed.js"></script>
+<!-- TikTok embed renderer: loaded only when the TikTok section is near, so
+     TikTok isn't hit on every page view (it rate-limits repeated loads) -->
+<script>
+  (() => {
+    const sec = document.getElementById('tiktok');
+    const load = () => { const s = document.createElement('script'); s.src = 'https://www.tiktok.com/embed.js'; s.async = true; document.body.appendChild(s); };
+    if (!('IntersectionObserver' in window)) return load();
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); load(); } }, { rootMargin: '600px 0px' });
+    io.observe(sec);
+  })();
+</script>
 
 </body>
 </html>

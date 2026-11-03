@@ -11,20 +11,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:          #0b0b16;
-      --bg-alt:      #12122a;
-      --card:        #171734;
-      --card-hover:  #1e1e42;
+      /* 2026 refresh: "one unexpected accent" palette.
+         Graphite monochrome base + a single Electric Lime accent. */
+      --bg:          #0A0A0C;   /* Graphite Black */
+      --bg-alt:      #111114;   /* Graphite */
+      --card:        #18181C;
+      --card-hover:  #202026;
       --border:      rgba(255,255,255,.08);
-      --cyan:        #22d3ee;
-      --cyan-dark:   #0891b2;
-      --violet:      #7c5cff;
-      --violet-dark: #5b3fd6;
+      --accent:      #C6FF3D;   /* Electric Lime: THE accent */
+      --cyan:        var(--accent);
+      --cyan-dark:   #9ED11F;
+      --violet:      var(--accent);
+      --violet-dark: #9ED11F;
       --white:       #ffffff;
-      --off-white:   #f4f5fb;
-      --muted:       #a1a8c3;
-      --muted-dark:  #6b7290;
-      --dark-text:   #12122a;
+      --off-white:   #F2F2F0;
+      --muted:       #A3A3AD;
+      --muted-dark:  #8A8A94;
+      --dark-text:   #0A0A0C;
       --radius:      14px;
       --shadow:      0 8px 30px rgba(0,0,0,.35);
       --shadow-lg:   0 20px 60px rgba(0,0,0,.45);
@@ -282,7 +285,186 @@
       .hero-text h1 { font-size: 2.2rem; }
       .section-title { font-size: 1.8rem; }
     }
+
+    /* ══ 2026 REFRESH: ONE UNEXPECTED ACCENT ═══════════════════
+       Monochrome graphite everywhere; Electric Lime is the only colour.
+       Lime is always paired with near-black text (16:1) or used as text
+       on the dark base (15:1+). */
+    ::selection { background: var(--accent); color: var(--dark-text); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+    nav { background: rgba(10,10,12,.85); }
+
+    /* Replace cyan→violet gradients with the single solid accent */
+    .gradient-text, .section-title span {
+      background: none; -webkit-background-clip: border-box; background-clip: border-box;
+      color: var(--accent);
+    }
+    .hero-text h1 .gradient-text { text-shadow: 0 0 40px rgba(198,255,61,.35); }
+    .nav-logo .gradient-text { color: var(--white); }
+    .nav-cta, .btn-primary { background: var(--accent); color: var(--dark-text) !important; }
+    .nav-cta:hover, .btn-primary:hover { box-shadow: 0 10px 30px rgba(198,255,61,.3); }
+    .product-card:hover .product-link { background: var(--accent); color: var(--dark-text); }
+    .section-tag { color: var(--muted); display: inline-flex; align-items: center; gap: .5rem; }
+    .section-tag::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+
+    /* Hero: graphite with one lime glow rising from below */
+    #hero {
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 115%, rgba(198,255,61,.22) 0%, rgba(198,255,61,.06) 45%, transparent 70%),
+        var(--bg);
+    }
+    .hero-pattern { background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); }
+    .hero-badge { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: var(--off-white); }
+    .hero-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    .phone-frame { border-color: #222228; }
+    .phone-glow { background: radial-gradient(circle, rgba(198,255,61,.28), transparent 70%); }
+
+    /* Content details */
+    .about-facts li svg, .contact-perks li svg { fill: var(--accent); }
+    .product-price { color: var(--accent); }
+    .short-card:hover, .product-card:hover { border-color: rgba(198,255,61,.35); }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--accent); }
+
+    /* CTA band: the one big lime moment */
+    #subscribe-cta { background: var(--accent); color: var(--dark-text); }
+    #subscribe-cta h2 { color: var(--dark-text); }
+    #subscribe-cta p { color: rgba(10,10,12,.82); }
+    #subscribe-cta .btn-primary { background: var(--dark-text); color: var(--white) !important; }
+    #subscribe-cta .btn-primary svg { fill: var(--white); }
+    #subscribe-cta .btn-ghost { border-color: rgba(10,10,12,.35); color: var(--dark-text); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .phone-glow { animation: limeGlow 8s ease-in-out infinite alternate; }
+      @keyframes limeGlow { from { opacity: .7; } to { opacity: 1; } }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+      .short-card:hover, .product-card:hover, .btn:hover, .nav-cta:hover { transform: none !important; }
+      .product-card:hover .product-image img { transform: none !important; }
+    }
+
+    /* ══ ENGAGEMENT LAYER: reveals, pills, micro-interactions ═══
+       Vanilla CSS/JS, no dependencies. Motion is opt-in: the inline script
+       in <head> adds .motion to <html> only when the visitor has not asked
+       for reduced motion, so content is always visible without JS. */
+
+    /* Mobile overflow fix: footer links were one unbroken row (~50px too wide) */
+    .footer-links { flex-wrap: wrap; gap: .75rem 1.75rem; }
+
+    /* Scroll progress: thin lime line under the nav (scroll-driven, no JS) */
+    .scroll-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
+
+    /* Pill nav: a lime-outlined pill slides to the section you are reading */
+    .nav-links { gap: .4rem; position: relative; }
+    .nav-links > li > a:not(.nav-cta), .nav-drop > button { position: relative; z-index: 1; padding: .45rem .85rem; border-radius: 50px; }
+    .nav-links > li > a.is-active { color: var(--white); }
+    .nav-links .nav-cta { margin-left: .6rem; }
+    .nav-pill {
+      position: absolute; top: 50%; left: 0; height: 2.15rem; width: var(--w, 0); list-style: none;
+      transform: translate(var(--x, 0), -50%); border-radius: 50px; pointer-events: none; opacity: 0;
+      background: rgba(198,255,61,.07); border: 1px solid rgba(198,255,61,.45);
+      transition: transform .4s cubic-bezier(.2,.8,.2,1), width .4s cubic-bezier(.2,.8,.2,1), opacity .25s;
+    }
+    .nav-pill.on { opacity: 1; }
+    .nav-mobile a.is-active { color: var(--accent); }
+
+    /* Hero: live dot, drawn underline, staggered entrance, floating phone */
+    .hero-badge::before { box-shadow: 0 0 0 0 rgba(198,255,61,.6); }
+    .hero-text h1 .gradient-text { position: relative; display: inline-block; }
+    .hero-text h1 .gradient-text::after {
+      content: ''; position: absolute; left: 0; right: .2em; bottom: .02em; height: .08em; border-radius: 4px;
+      background: var(--accent); transform-origin: 0 50%;
+    }
+    .hero-stats { display: grid; grid-template-columns: repeat(2, max-content); gap: 1.25rem 3rem; }
+    @media (max-width: 900px) { .hero-stats { justify-content: center; text-align: left; gap: 1.1rem 1.75rem; } }
+    .hero-stat-value [data-count] { font-variant-numeric: tabular-nums; color: var(--accent); }
+
+    /* Topic marquee strip */
+    .topic-marquee { background: var(--bg-alt); border-block: 1px solid var(--border); padding: 1.1rem 0; overflow: hidden; }
+    .marquee-track { display: flex; gap: .75rem; width: max-content; list-style: none; }
+    .marquee-track li { display: inline-flex; align-items: center; gap: .55rem; white-space: nowrap; font-size: .9rem; font-weight: 600; color: var(--off-white); padding: .45rem 1rem; border: 1px solid var(--border); border-radius: 50px; background: var(--card); }
+    .marquee-track li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    html:not(.motion) .marquee-track { width: auto; flex-wrap: wrap; justify-content: center; padding: 0 5%; }
+    html:not(.motion) .marquee-track [aria-hidden="true"] { display: none; }
+
+    /* Filter pills + chips */
+    .filter-pills { display: flex; flex-wrap: wrap; gap: .6rem; margin: -1.25rem 0 2rem; }
+    .pill {
+      display: inline-flex; align-items: center; gap: .5rem; font: inherit; font-size: .88rem; font-weight: 600;
+      color: var(--off-white); background: var(--card); border: 1px solid var(--border); padding: .5rem .95rem;
+      border-radius: 50px; cursor: pointer; transition: background .2s, border-color .2s, color .2s, transform .2s;
+    }
+    .pill:hover { border-color: rgba(198,255,61,.5); transform: translateY(-1px); }
+    .pill:active { transform: scale(.96); }
+    .pill[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--dark-text); }
+    .pill-count { font-size: .74rem; font-weight: 700; min-width: 1.45rem; padding: .05rem .4rem; border-radius: 50px; text-align: center; background: rgba(255,255,255,.08); color: var(--muted); }
+    .pill[aria-pressed="true"] .pill-count { background: rgba(10,10,12,.14); color: var(--dark-text); }
+    .chip {
+      display: inline-flex; align-items: center; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      padding: .22rem .6rem; border-radius: 50px; color: var(--muted); background: rgba(255,255,255,.05); border: 1px solid var(--border);
+    }
+    .chip-accent { color: var(--accent); background: rgba(198,255,61,.08); border-color: rgba(198,255,61,.25); }
+    .short-meta { display: flex; flex-wrap: wrap; gap: .4rem; padding: .95rem 1.1rem 0; }
+    .short-meta + .short-caption { padding-top: .55rem; }
+    .short-card[hidden] { display: none; }
+    #medicationsGrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } /* filtered cards keep their size */
+    .product-image { position: relative; }
+    .product-badge { position: absolute; top: .75rem; left: .75rem; z-index: 1; background: rgba(10,10,12,.78); color: var(--off-white); backdrop-filter: blur(6px); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    /* Hover micro-interactions: cursor-following lime spotlight, arrow nudge, press */
+    .short-card, .product-card { position: relative; }
+    .short-card::after, .product-card::after {
+      content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%), rgba(198,255,61,.10), transparent 65%);
+    }
+    .short-card:hover::after, .product-card:hover::after { opacity: 1; }
+    .btn .arrow { display: inline-block; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+    .btn:hover .arrow { transform: translateX(4px); }
+    .btn:active { transform: scale(.97); }
+    .footer-social a:hover svg { fill: var(--accent); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: scroll()) {
+        .scroll-progress { animation: progress linear both; animation-timeline: scroll(root); }
+        @keyframes progress { to { transform: scaleX(1); } }
+      }
+      .motion .hero-badge::before { animation: ping 2.4s cubic-bezier(.2,.8,.2,1) infinite; }
+      @keyframes ping { 70%, 100% { box-shadow: 0 0 0 8px rgba(198,255,61,0); } }
+      .motion .hero-text > * { animation: rise .8s cubic-bezier(.2,.8,.2,1) both; }
+      .motion .hero-text > :nth-child(2) { animation-delay: .08s; }
+      .motion .hero-text > :nth-child(3) { animation-delay: .16s; }
+      .motion .hero-text > :nth-child(4) { animation-delay: .24s; }
+      .motion .hero-text > :nth-child(5) { animation-delay: .32s; }
+      .motion .hero-text h1 .gradient-text::after { animation: draw .9s .55s cubic-bezier(.65,0,.35,1) both; }
+      .motion .hero-preview { animation: rise 1s .2s cubic-bezier(.2,.8,.2,1) both; }
+      .motion .phone-frame { animation: float 7s ease-in-out 1.2s infinite; }
+      .motion .hero-pattern { animation: drift 40s linear infinite; }
+      @keyframes rise { from { opacity: 0; transform: translateY(22px); } }
+      @keyframes draw { from { transform: scaleX(0); } }
+      @keyframes float { 50% { transform: translateY(-10px); } }
+      @keyframes drift { to { background-position: 26px 26px; } }
+
+      .motion .marquee-track { animation: marquee 45s linear infinite; }
+      .topic-marquee:hover .marquee-track, .topic-marquee:focus-within .marquee-track { animation-play-state: paused; }
+      @keyframes marquee { to { transform: translateX(calc(-50% - .375rem)); } }
+
+      /* Scroll reveal (fade + slide up, staggered by --i) */
+      .motion [data-reveal] {
+        opacity: 0; transform: translateY(26px);
+        transition: opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1);
+        transition-delay: calc(var(--i, 0) * 70ms);
+      }
+      .motion [data-reveal].in { opacity: 1; transform: none; }
+      .motion .short-card.pop { animation: pop .45s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 45ms); }
+      @keyframes pop { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+    }
   </style>
+  <script>
+    // Opt into motion before first paint so revealed content never flashes.
+    if (matchMedia('(prefers-reduced-motion: no-preference)').matches) document.documentElement.classList.add('motion');
+  </script>
 </head>
 <body>
 
@@ -290,6 +472,7 @@
   <div class="nav-inner">
     <a href="#hero" class="nav-logo"><img src="assets/logo.png" alt="Science Made Visual logo" class="logo-icon" /><span class="gradient-text">Science Made Visual</span></a>
     <ul class="nav-links">
+      <li class="nav-pill" aria-hidden="true"></li>
       <li><a href="#medications">Medications</a></li>
       <li><a href="#leadership">Leadership</a></li>
       <li><a href="#shop">Shop</a></li>
@@ -326,6 +509,7 @@
     </div>
     <a href="https://www.youtube.com/@ScienceMadeVisual?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a>
   </div>
+  <div class="scroll-progress" aria-hidden="true"></div>
 </nav>
 
 <!-- ── HERO ─────────────────────────────────────────────── -->
@@ -345,9 +529,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-2.59-2.6c.27 0 .53.04.78.12V9.66a5.7 5.7 0 0 0-.78-.05 5.7 5.7 0 1 0 5.7 5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.28 4.28 0 0 1-3.26-1.48z"/></svg>
           Follow on TikTok
         </a>
-        <a class="btn btn-ghost" href="#medications">Explore the series</a>
+        <a class="btn btn-ghost" href="#medications">Explore the series <span class="arrow" aria-hidden="true">→</span></a>
       </div>
       <div class="hero-stats">
+        <div><div class="hero-stat-value"><span data-count id="episodeCount">11</span> explainers</div><div class="hero-stat-label">Published so far</div></div>
         <div><div class="hero-stat-value">New episode weekly</div><div class="hero-stat-label">Medications series</div></div>
         <div><div class="hero-stat-value">Max 3 minutes</div><div class="hero-stat-label">Per explainer</div></div>
         <div><div class="hero-stat-value">Zero fluff</div><div class="hero-stat-label">Accurate mechanisms</div></div>
@@ -362,15 +547,33 @@
   </div>
 </section>
 
+<!-- ── TOPIC MARQUEE ────────────────────────────────────── -->
+<div class="topic-marquee" aria-label="Topics covered">
+  <ul class="marquee-track" id="marqueeTrack">
+    <li>Calcium channel blockers</li>
+    <li>Statins</li>
+    <li>Macrolide antibiotics</li>
+    <li>GLP-1 agonists</li>
+    <li>Co-careldopa</li>
+    <li>SGLT2 inhibitors</li>
+    <li>SSRIs &amp; SNRIs</li>
+    <li>Antidepressant evidence</li>
+    <li>Clinical leadership</li>
+    <li>Retaining senior clinicians</li>
+  </ul>
+</div>
+
 <!-- ── MEDICATIONS SERIES ───────────────────────────────── -->
 <section id="medications">
   <div class="section-inner">
     <div class="section-tag">Medications</div>
     <h2 class="section-title">Pharmacology that <span>clicks</span></h2>
     <p class="section-subtitle">Each Short takes one medication and animates exactly how it works inside your body — the receptors, channels, and pathways — in 3 minutes or less. Built for nursing and medical students, exam‑crammers, and anyone curious about what their prescriptions are doing. Clear visuals, accurate mechanisms, zero fluff.</p>
+    <div class="filter-pills" id="medFilters" role="group" aria-label="Filter explainers by drug class"></div>
+    <p class="sr-only" id="medFilterStatus" aria-live="polite"></p>
     <div class="series-grid" id="medicationsGrid"></div>
     <div class="series-cta">
-      <a class="btn btn-ghost" href="https://youtube.com/playlist?list=PLNrMcS-BlJSAmRJvX6ASfMua8TGc0dV-u" target="_blank" rel="noopener">Watch the full playlist →</a>
+      <a class="btn btn-ghost" href="https://youtube.com/playlist?list=PLNrMcS-BlJSAmRJvX6ASfMua8TGc0dV-u" target="_blank" rel="noopener">Watch the full playlist <span class="arrow" aria-hidden="true">→</span></a>
     </div>
   </div>
 </section>
@@ -383,7 +586,7 @@
     <p class="section-subtitle">A weekly series on what it really takes to lead in pharmacy and healthcare — from using the expertise around you to retaining your most experienced clinicians.</p>
     <div class="series-grid" id="leadershipGrid"></div>
     <div class="series-cta">
-      <a class="btn btn-ghost" href="https://youtube.com/playlist?list=PLNrMcS-BlJSD9ln4zuPqepJMa-X3svrkp" target="_blank" rel="noopener">Watch the full playlist →</a>
+      <a class="btn btn-ghost" href="https://youtube.com/playlist?list=PLNrMcS-BlJSD9ln4zuPqepJMa-X3svrkp" target="_blank" rel="noopener">Watch the full playlist <span class="arrow" aria-hidden="true">→</span></a>
     </div>
   </div>
 </section>
@@ -396,7 +599,7 @@
     <p class="section-subtitle">Alongside the videos, Danny designs and 3D prints original pieces under Lunchbox Designs — from digital STL files you can print at home to ready-made art and desk accessories. Each one links straight through to the individual listing on Etsy.</p>
     <div class="shop-grid" id="shopGrid"></div>
     <div class="series-cta">
-      <a class="btn btn-ghost" href="https://www.etsy.com/uk/shop/LunchboxDesignsUK" target="_blank" rel="noopener">Visit the Lunchbox Designs Etsy shop →</a>
+      <a class="btn btn-ghost" href="https://www.etsy.com/uk/shop/LunchboxDesignsUK" target="_blank" rel="noopener">Visit the Lunchbox Designs Etsy shop <span class="arrow" aria-hidden="true">→</span></a>
     </div>
   </div>
 </section>
@@ -562,20 +765,71 @@
     ]
   };
 
-  function renderSeries(containerId, videos) {
+  // Drug-class tags are inferred from each title, so new episodes need no extra
+  // field — first match wins; anything unmatched is tagged "More".
+  const TOPICS = [
+    { key: 'cardio',      label: 'Cardiovascular',    match: /calcium channel|statin|beta.?blocker|ace inhibitor|anticoagul/i },
+    { key: 'antibiotics', label: 'Antibiotics',       match: /penicillin|macrolide|antibiotic/i },
+    { key: 'metabolic',   label: 'Diabetes & weight', match: /glp-1|sglt2|diabetes|insulin|metformin|weight/i },
+    { key: 'neuro',       label: 'Neurology',         match: /careldopa|parkinson|epilep|migraine/i },
+    { key: 'mental',      label: 'Mental health',     match: /ssri|snri|antidepress|anxiety/i }
+  ];
+  const topicFor = title => TOPICS.find(t => t.match.test(title)) || { key: 'more', label: 'More' };
+
+  function renderSeries(containerId, videos, fixedTag) {
     const el = document.getElementById(containerId);
-    el.innerHTML = videos.map(v => `
-      <div class="short-card">
+    el.innerHTML = videos.map(v => {
+      const ep = v.title.match(/^Episode (\d+)\s*·\s*/);
+      const topic = fixedTag ? { key: 'all', label: fixedTag } : topicFor(v.title);
+      return `
+      <div class="short-card" data-topic="${topic.key}">
         <div class="short-video">
           <iframe src="https://www.youtube.com/embed/${v.id}" title="${v.title}" loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
-        <div class="short-caption">${v.title}</div>
-      </div>
-    `).join('');
+        <div class="short-meta">
+          <span class="chip chip-accent">${topic.label}</span>${ep ? `<span class="chip">Ep ${ep[1]}</span>` : ''}
+        </div>
+        <div class="short-caption">${ep ? v.title.slice(ep[0].length) : v.title}</div>
+      </div>`;
+    }).join('');
   }
   renderSeries('medicationsGrid', SERIES.medications);
-  renderSeries('leadershipGrid', SERIES.leadership);
+  renderSeries('leadershipGrid', SERIES.leadership, 'Leadership');
+
+  // ── Drug-class filter pills ──
+  function renderFilters() {
+    const wrap = document.getElementById('medFilters');
+    const status = document.getElementById('medFilterStatus');
+    const cards = [...document.querySelectorAll('#medicationsGrid .short-card')];
+    const counts = cards.reduce((c, card) => (c[card.dataset.topic] = (c[card.dataset.topic] || 0) + 1, c), {});
+    const pills = [{ key: 'all', label: 'All' }, ...TOPICS, { key: 'more', label: 'More' }]
+      .filter(t => t.key === 'all' || counts[t.key]);
+    wrap.innerHTML = pills.map(t => `
+      <button type="button" class="pill" data-filter="${t.key}" aria-pressed="${t.key === 'all'}">
+        ${t.label}<span class="pill-count">${t.key === 'all' ? cards.length : counts[t.key]}</span>
+      </button>`).join('');
+    wrap.addEventListener('click', e => {
+      const btn = e.target.closest('.pill');
+      if (!btn) return;
+      const key = btn.dataset.filter;
+      wrap.querySelectorAll('.pill').forEach(p => p.setAttribute('aria-pressed', p === btn));
+      let shown = 0;
+      cards.forEach(card => {
+        const match = key === 'all' || card.dataset.topic === key;
+        card.hidden = !match;
+        card.classList.remove('pop');
+        if (match) {
+          card.removeAttribute('data-reveal');
+          card.style.setProperty('--i', shown++);
+          void card.offsetWidth; // restart the pop animation
+          card.classList.add('pop');
+        }
+      });
+      status.textContent = `Showing ${shown} of ${cards.length} explainers`;
+    });
+  }
+  renderFilters();
 
   // ── Lunchbox Designs products — Etsy shop ──
   const PRODUCTS = [
@@ -621,7 +875,7 @@
     const el = document.getElementById(containerId);
     el.innerHTML = products.map(p => `
       <a class="product-card" href="${p.url}" target="_blank" rel="noopener">
-        <div class="product-image"><img src="${p.image}" alt="${p.title}" loading="lazy" /></div>
+        <div class="product-image"><span class="chip product-badge">${/STL/i.test(p.title) ? 'STL file' : '3D printed'}</span><img src="${p.image}" alt="${p.title}" loading="lazy" /></div>
         <div class="product-info">
           <div class="product-title">${p.title}</div>
           <div class="product-price">${p.price}</div>
@@ -634,6 +888,94 @@
     `).join('');
   }
   renderShop('shopGrid', PRODUCTS);
+
+  // ── Engagement layer (see the CSS block of the same name) ──
+  const motion = document.documentElement.classList.contains('motion');
+
+  // Episode counter: total comes from SERIES, counts up once on load
+  const counter = document.getElementById('episodeCount');
+  const total = SERIES.medications.length + SERIES.leadership.length;
+  counter.textContent = total;
+  if (motion) {
+    const t0 = performance.now(), dur = 1400;
+    const tick = now => {
+      const p = Math.min((now - t0) / dur, 1);
+      counter.textContent = Math.round(total * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // Marquee: duplicate the list once for a seamless loop (copy hidden from AT)
+  const track = document.getElementById('marqueeTrack');
+  [...track.children].forEach(li => {
+    const copy = li.cloneNode(true);
+    copy.setAttribute('aria-hidden', 'true');
+    track.appendChild(copy);
+  });
+
+  // Scroll reveal: fade/slide-up, staggered within each group
+  if (motion && 'IntersectionObserver' in window) {
+    const groups = [
+      '.section-inner > .section-tag, .section-inner > .section-title, .section-inner > .section-subtitle, .section-inner > .filter-pills',
+      '.about-grid > div > .section-tag, .about-grid > div > .section-title, .about-grid > div > .section-subtitle',
+      '.contact-grid > div > .section-tag, .contact-grid > div > .section-title, .contact-grid > div > .section-subtitle',
+      '#medicationsGrid > .short-card', '#leadershipGrid > .short-card', '#shopGrid > .product-card',
+      '.about-facts > li', '.contact-perks > li', '.about-quote, .contact-form',
+      '.series-cta', '.tiktok-feature-head, .tiktok-embeds', '#subscribe-cta .section-inner > *'
+    ];
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+      // Hand control back to the element's own hover transitions once revealed
+      e.target.addEventListener('transitionend', () => e.target.removeAttribute('data-reveal'), { once: true });
+    }), { rootMargin: '0px 0px -8% 0px', threshold: .12 });
+    groups.forEach(sel => {
+      const byParent = new Map();
+      document.querySelectorAll(sel).forEach(el => {
+        const i = byParent.get(el.parentElement) || 0;
+        byParent.set(el.parentElement, i + 1);
+        el.dataset.reveal = '';
+        el.style.setProperty('--i', Math.min(i, 8));
+        io.observe(el);
+      });
+    });
+  }
+
+  // Cursor-following spotlight on cards
+  document.addEventListener('pointermove', e => {
+    const card = e.target.closest && e.target.closest('.short-card, .product-card');
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    card.style.setProperty('--my', `${e.clientY - r.top}px`);
+  }, { passive: true });
+
+  // Pill nav: highlight the section currently in view
+  const navPill = document.querySelector('.nav-pill');
+  const navLinks = [...document.querySelectorAll('.nav-links a[href^="#"], .nav-mobile a[href^="#"]')];
+  function setActive(id) {
+    let desktop = null;
+    navLinks.forEach(a => {
+      const on = a.getAttribute('href') === `#${id}`;
+      a.classList.toggle('is-active', on);
+      if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      if (on && a.closest('.nav-links')) desktop = a;
+    });
+    navPill.classList.toggle('on', !!desktop && desktop.offsetWidth > 0);
+    if (desktop) {
+      navPill.style.setProperty('--x', `${desktop.offsetLeft}px`);
+      navPill.style.setProperty('--w', `${desktop.offsetWidth}px`);
+    }
+  }
+  let currentSection = null;
+  const sectionIO = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) setActive(currentSection = e.target.id);
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => sectionIO.observe(s));
+  addEventListener('resize', () => currentSection && setActive(currentSection));
+  document.fonts && document.fonts.ready.then(() => currentSection && setActive(currentSection));
 </script>
 <!-- TikTok embed renderer -->
 <script async src="https://www.tiktok.com/embed.js"></script>

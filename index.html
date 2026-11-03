@@ -11,23 +11,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      /* 2026 refresh: "one unexpected accent" palette.
-         Graphite monochrome base + a single Electric Lime accent. */
-      --bg:          #0A0A0C;   /* Graphite Black */
-      --bg-alt:      #111114;   /* Graphite */
-      --card:        #18181C;
-      --card-hover:  #202026;
-      --border:      rgba(255,255,255,.08);
-      --accent:      #C6FF3D;   /* Electric Lime: THE accent */
+      /* Ocean teal (chosen on the tracker, 3 Nov 2026): deep sea teal base,
+         aqua and coral glows, coral buttons. Topic colours per drug class. */
+      --bg:          #073B44;   /* Deep sea teal */
+      --bg-alt:      #084650;
+      --card:        #0E4A54;
+      --card-hover:  #125762;
+      --border:      rgba(255,255,255,.11);
+      --accent:      #FF7A59;   /* Coral: buttons and CTAs */
+      --aqua:        #19D3C5;   /* Secondary glow */
       --cyan:        var(--accent);
-      --cyan-dark:   #9ED11F;
+      --cyan-dark:   #E85E3C;
       --violet:      var(--accent);
-      --violet-dark: #9ED11F;
+      --violet-dark: #E85E3C;
       --white:       #ffffff;
-      --off-white:   #F2F2F0;
-      --muted:       #A3A3AD;
-      --muted-dark:  #8A8A94;
-      --dark-text:   #0A0A0C;
+      --off-white:   #F1FAFA;
+      --muted:       #BFE6E6;
+      --muted-dark:  #9CCFD0;
+      --dark-text:   #07272D;
       --radius:      14px;
       --shadow:      0 8px 30px rgba(0,0,0,.35);
       --shadow-lg:   0 20px 60px rgba(0,0,0,.45);
@@ -292,17 +293,17 @@
        on the dark base (15:1+). */
     ::selection { background: var(--accent); color: var(--dark-text); }
     :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-    nav { background: rgba(10,10,12,.85); }
+    nav { background: rgba(7,39,45,.85); }
 
     /* Replace cyan→violet gradients with the single solid accent */
     .gradient-text, .section-title span {
       background: none; -webkit-background-clip: border-box; background-clip: border-box;
       color: var(--accent);
     }
-    .hero-text h1 .gradient-text { text-shadow: 0 0 40px rgba(198,255,61,.35); }
+    .hero-text h1 .gradient-text { text-shadow: 0 0 40px rgba(255,122,89,.35); }
     .nav-logo .gradient-text { color: var(--white); }
     .nav-cta, .btn-primary { background: var(--accent); color: var(--dark-text) !important; }
-    .nav-cta:hover, .btn-primary:hover { box-shadow: 0 10px 30px rgba(198,255,61,.3); }
+    .nav-cta:hover, .btn-primary:hover { box-shadow: 0 10px 30px rgba(255,122,89,.3); }
     .product-card:hover .product-link { background: var(--accent); color: var(--dark-text); }
     .section-tag { color: var(--muted); display: inline-flex; align-items: center; gap: .5rem; }
     .section-tag::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
@@ -310,28 +311,28 @@
     /* Hero: graphite with one lime glow rising from below */
     #hero {
       background:
-        radial-gradient(ellipse 70% 55% at 50% 115%, rgba(198,255,61,.22) 0%, rgba(198,255,61,.06) 45%, transparent 70%),
+        radial-gradient(ellipse 70% 55% at 50% 115%, rgba(255,122,89,.22) 0%, rgba(255,122,89,.06) 45%, transparent 70%),
         var(--bg);
     }
     .hero-pattern { background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); }
     .hero-badge { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: var(--off-white); }
     .hero-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
     .phone-frame { border-color: #222228; }
-    .phone-glow { background: radial-gradient(circle, rgba(198,255,61,.28), transparent 70%); }
+    .phone-glow { background: radial-gradient(circle, rgba(255,122,89,.28), transparent 70%); }
 
     /* Content details */
     .about-facts li svg, .contact-perks li svg { fill: var(--accent); }
     .product-price { color: var(--accent); }
-    .short-card:hover, .product-card:hover { border-color: rgba(198,255,61,.35); }
+    .short-card:hover, .product-card:hover { border-color: rgba(255,122,89,.35); }
     .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--accent); }
 
     /* CTA band: the one big lime moment */
     #subscribe-cta { background: var(--accent); color: var(--dark-text); }
     #subscribe-cta h2 { color: var(--dark-text); }
-    #subscribe-cta p { color: rgba(10,10,12,.82); }
+    #subscribe-cta p { color: rgba(7,39,45,.82); }
     #subscribe-cta .btn-primary { background: var(--dark-text); color: var(--white) !important; }
     #subscribe-cta .btn-primary svg { fill: var(--white); }
-    #subscribe-cta .btn-ghost { border-color: rgba(10,10,12,.35); color: var(--dark-text); }
+    #subscribe-cta .btn-ghost { border-color: rgba(7,39,45,.35); color: var(--dark-text); }
 
     @media (prefers-reduced-motion: no-preference) {
       .phone-glow { animation: limeGlow 8s ease-in-out infinite alternate; }
@@ -363,14 +364,14 @@
     .nav-pill {
       position: absolute; top: 50%; left: 0; height: 2.15rem; width: var(--w, 0); list-style: none;
       transform: translate(var(--x, 0), -50%); border-radius: 50px; pointer-events: none; opacity: 0;
-      background: rgba(198,255,61,.07); border: 1px solid rgba(198,255,61,.45);
+      background: rgba(255,122,89,.07); border: 1px solid rgba(255,122,89,.45);
       transition: transform .4s cubic-bezier(.2,.8,.2,1), width .4s cubic-bezier(.2,.8,.2,1), opacity .25s;
     }
     .nav-pill.on { opacity: 1; }
     .nav-mobile a.is-active { color: var(--accent); }
 
     /* Hero: live dot, drawn underline, staggered entrance, floating phone */
-    .hero-badge::before { box-shadow: 0 0 0 0 rgba(198,255,61,.6); }
+    .hero-badge::before { box-shadow: 0 0 0 0 rgba(255,122,89,.6); }
     .hero-text h1 .gradient-text { position: relative; display: inline-block; }
     .hero-text h1 .gradient-text::after {
       content: ''; position: absolute; left: 0; right: .2em; bottom: .02em; height: .08em; border-radius: 4px;
@@ -395,29 +396,29 @@
       color: var(--off-white); background: var(--card); border: 1px solid var(--border); padding: .5rem .95rem;
       border-radius: 50px; cursor: pointer; transition: background .2s, border-color .2s, color .2s, transform .2s;
     }
-    .pill:hover { border-color: rgba(198,255,61,.5); transform: translateY(-1px); }
+    .pill:hover { border-color: rgba(255,122,89,.5); transform: translateY(-1px); }
     .pill:active { transform: scale(.96); }
     .pill[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--dark-text); }
-    .pill-count { font-size: .74rem; font-weight: 700; min-width: 1.45rem; padding: .05rem .4rem; border-radius: 50px; text-align: center; background: rgba(255,255,255,.08); color: var(--muted); }
-    .pill[aria-pressed="true"] .pill-count { background: rgba(10,10,12,.14); color: var(--dark-text); }
+    .pill-count { font-size: .74rem; font-weight: 700; min-width: 1.45rem; padding: .05rem .4rem; border-radius: 50px; text-align: center; background: rgba(255,255,255,.1); color: var(--muted); }
+    .pill[aria-pressed="true"] .pill-count { background: rgba(7,39,45,.14); color: var(--dark-text); }
     .chip {
       display: inline-flex; align-items: center; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
       padding: .22rem .6rem; border-radius: 50px; color: var(--muted); background: rgba(255,255,255,.05); border: 1px solid var(--border);
     }
-    .chip-accent { color: var(--accent); background: rgba(198,255,61,.08); border-color: rgba(198,255,61,.25); }
+    .chip-accent { color: var(--accent); background: rgba(255,122,89,.08); border-color: rgba(255,122,89,.25); }
     .short-meta { display: flex; flex-wrap: wrap; gap: .4rem; padding: .95rem 1.1rem 0; }
     .short-meta + .short-caption { padding-top: .55rem; }
     .short-card[hidden] { display: none; }
     #medicationsGrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } /* filtered cards keep their size */
     .product-image { position: relative; }
-    .product-badge { position: absolute; top: .75rem; left: .75rem; z-index: 1; background: rgba(10,10,12,.78); color: var(--off-white); backdrop-filter: blur(6px); }
+    .product-badge { position: absolute; top: .75rem; left: .75rem; z-index: 1; background: rgba(7,39,45,.78); color: var(--off-white); backdrop-filter: blur(6px); }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
     /* Hover micro-interactions: cursor-following lime spotlight, arrow nudge, press */
     .short-card, .product-card { position: relative; }
     .short-card::after, .product-card::after {
       content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
-      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%), rgba(198,255,61,.10), transparent 65%);
+      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%), rgba(255,122,89,.10), transparent 65%);
     }
     .short-card:hover::after, .product-card:hover::after { opacity: 1; }
     .btn .arrow { display: inline-block; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
@@ -431,7 +432,7 @@
         @keyframes progress { to { transform: scaleX(1); } }
       }
       .motion .hero-badge::before { animation: ping 2.4s cubic-bezier(.2,.8,.2,1) infinite; }
-      @keyframes ping { 70%, 100% { box-shadow: 0 0 0 8px rgba(198,255,61,0); } }
+      @keyframes ping { 70%, 100% { box-shadow: 0 0 0 8px rgba(255,122,89,0); } }
       .motion .hero-text > * { animation: rise .8s cubic-bezier(.2,.8,.2,1) both; }
       .motion .hero-text > :nth-child(2) { animation-delay: .08s; }
       .motion .hero-text > :nth-child(3) { animation-delay: .16s; }
@@ -446,9 +447,9 @@
       @keyframes float { 50% { transform: translateY(-10px); } }
       @keyframes drift { to { background-position: 26px 26px; } }
 
-      .motion .marquee-track { animation: marquee 45s linear infinite; }
+      .motion .marquee-track { animation: marquee 70s linear infinite; }
       .topic-marquee:hover .marquee-track, .topic-marquee:focus-within .marquee-track { animation-play-state: paused; }
-      @keyframes marquee { to { transform: translateX(calc(-50% - .375rem)); } }
+      @keyframes marquee { to { transform: translateX(calc(-50% - .5rem)); } }
 
       /* Scroll reveal (fade + slide up, staggered by --i) */
       .motion [data-reveal] {
@@ -465,8 +466,8 @@
        Every topic colour is 6:1+ as text on the graphite cards, and filled
        pills use near-black text (7:1+). */
     :root {
-      --t-cardio: #FF7A6B; --t-antibiotics: #3DD9EB; --t-metabolic: #FFB627;
-      --t-neuro: #B49BFF; --t-mental: #FF6FB5; --t-more: var(--accent); --t-leadership: #6CB4FF;
+      --t-cardio: #FF8A7A; --t-antibiotics: #5CF0FF; --t-metabolic: #FFC24D;
+      --t-neuro: #C2B0FF; --t-mental: #FF8FC8; --t-more: var(--aqua); --t-leadership: #8CC4FF;
     }
     [data-topic="cardio"], [data-filter="cardio"] { --tc: var(--t-cardio); }
     [data-topic="antibiotics"], [data-filter="antibiotics"] { --tc: var(--t-antibiotics); }
@@ -493,28 +494,45 @@
       -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none;
     }
     .hero-text h1 .gradient-text::after { background: linear-gradient(90deg, var(--t-antibiotics), var(--t-neuro), var(--t-mental), var(--t-cardio), var(--t-metabolic)); }
+    /* Hero: a drifting aqua and coral aurora over the teal */
     #hero {
       background:
-        radial-gradient(ellipse 45% 40% at 8% 12%, rgba(180,155,255,.16), transparent 70%),
-        radial-gradient(ellipse 40% 35% at 95% 20%, rgba(255,122,107,.12), transparent 70%),
-        radial-gradient(ellipse 70% 55% at 50% 115%, rgba(198,255,61,.18) 0%, rgba(198,255,61,.05) 45%, transparent 70%),
-        var(--bg);
+        radial-gradient(ellipse 50% 45% at 10% 15%, rgba(25,211,197,.32), transparent 70%),
+        radial-gradient(ellipse 45% 40% at 92% 22%, rgba(255,122,89,.24), transparent 70%),
+        radial-gradient(ellipse 70% 55% at 50% 115%, rgba(92,240,255,.20) 0%, transparent 70%),
+        linear-gradient(160deg, var(--bg) 0%, #0B5C66 100%);
+      background-size: 160% 160%, 160% 160%, 100% 100%, 100% 100%;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .motion #hero { animation: aurora 18s ease-in-out infinite alternate; }
+      @keyframes aurora {
+        to { background-position: 60% 40%, 20% 70%, 0 0, 0 0; }
+      }
     }
     .phone-glow { background: conic-gradient(from 0deg, var(--t-cardio), var(--t-metabolic), var(--accent), var(--t-antibiotics), var(--t-neuro), var(--t-mental), var(--t-cardio)); opacity: .42; border-radius: 50%; }
 
-    /* Marquee dots cycle through the topic colours */
-    /* Marquee topics are links: dot in the topic's colour, click jumps to it */
-    .marquee-track li { padding: 0; }
+    /* Topic marquee: big picture buttons. Click jumps to that topic's episode */
+    .topic-marquee { padding: 1.4rem 0; }
+    .marquee-track { gap: 1rem; }
+    .marquee-track li { padding: 0; border-radius: 18px; border-color: color-mix(in srgb, var(--tc, var(--accent)) 35%, transparent); background: var(--card); overflow: hidden; transition: transform .25s, border-color .25s, box-shadow .25s; }
     .marquee-track li::before { display: none; }
     .marquee-track a {
-      display: inline-flex; align-items: center; gap: .55rem; padding: .45rem 1rem; border-radius: 50px;
-      color: inherit; text-decoration: none; transition: background .2s, color .2s;
+      display: flex; flex-direction: column; align-items: center; gap: .55rem; width: 158px; padding: .8rem .8rem .9rem;
+      color: var(--off-white); text-decoration: none; white-space: normal; text-align: center; font-size: .9rem; line-height: 1.2;
     }
-    .marquee-track a::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tc, var(--accent)); transition: transform .2s; }
-    .marquee-track li[data-topic]:hover { border-color: var(--tc); }
-    .marquee-track a:hover { color: var(--white); background: color-mix(in srgb, var(--tc) 12%, transparent); }
-    .marquee-track a:hover::before { transform: scale(1.5); }
-    .marquee-track a:focus-visible { outline-offset: 2px; }
+    .marquee-track img { width: 104px; height: 104px; border-radius: 50%; object-fit: cover; background: var(--bg);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--tc, var(--accent)) 55%, transparent), 0 10px 26px -10px var(--tc, var(--accent)); transition: transform .3s; }
+    .marquee-track span { min-height: 2.4em; display: flex; align-items: center; }
+    .marquee-track li[data-topic]:hover, .marquee-track li[data-topic]:focus-within {
+      transform: translateY(-5px); border-color: var(--tc);
+      box-shadow: 0 16px 40px -18px var(--tc), inset 0 0 0 1px color-mix(in srgb, var(--tc) 40%, transparent);
+    }
+    .marquee-track li:hover img { transform: scale(1.08) rotate(-3deg); }
+    .marquee-track a:focus-visible { outline-offset: -4px; border-radius: 16px; }
+    @media (max-width: 600px) {
+      .marquee-track a { width: 128px; font-size: .82rem; }
+      .marquee-track img { width: 84px; height: 84px; }
+    }
     /* Episode a marquee link jumped to: brief ring in its topic colour */
     .short-card.spotlit { border-color: var(--tc, var(--accent)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tc, var(--accent)) 45%, transparent), 0 18px 50px color-mix(in srgb, var(--tc, var(--accent)) 25%, transparent); }
 
@@ -613,16 +631,16 @@
 <div class="topic-marquee" aria-label="Topics covered">
   <ul class="marquee-track" id="marqueeTrack">
     <!-- data-topic picks the filter (and dot colour); data-match finds the episode to highlight -->
-    <li data-topic="cardio"><a href="#medications" data-match="calcium channel">Calcium channel blockers</a></li>
-    <li data-topic="cardio"><a href="#medications" data-match="statins">Statins</a></li>
-    <li data-topic="antibiotics"><a href="#medications" data-match="macrolide">Macrolide antibiotics</a></li>
-    <li data-topic="metabolic"><a href="#medications" data-match="glp-1">GLP-1 agonists</a></li>
-    <li data-topic="neuro"><a href="#medications" data-match="careldopa">Co-careldopa</a></li>
-    <li data-topic="metabolic"><a href="#medications" data-match="sglt2">SGLT2 inhibitors</a></li>
-    <li data-topic="mental"><a href="#medications" data-match="ssris">SSRIs &amp; SNRIs</a></li>
-    <li data-topic="mental"><a href="#medications" data-match="myths vs studies">Antidepressant evidence</a></li>
-    <li data-topic="leadership"><a href="#leadership" data-match="expertise around">Clinical leadership</a></li>
-    <li data-topic="leadership"><a href="#leadership" data-match="retain senior">Retaining senior clinicians</a></li>
+    <li data-topic="cardio"><a href="#medications" data-match="calcium channel"><img src="images/topics/ccb.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>Calcium channel blockers</span></a></li>
+    <li data-topic="cardio"><a href="#medications" data-match="statins"><img src="images/topics/statins.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>Statins</span></a></li>
+    <li data-topic="antibiotics"><a href="#medications" data-match="macrolide"><img src="images/topics/macrolides.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>Macrolide antibiotics</span></a></li>
+    <li data-topic="metabolic"><a href="#medications" data-match="glp-1"><img src="images/topics/glp1.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>GLP-1 agonists</span></a></li>
+    <li data-topic="neuro"><a href="#medications" data-match="careldopa"><img src="images/topics/careldopa.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>Co-careldopa</span></a></li>
+    <li data-topic="metabolic"><a href="#medications" data-match="sglt2"><img src="images/topics/sglt2.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>SGLT2 inhibitors</span></a></li>
+    <li data-topic="mental"><a href="#medications" data-match="ssris"><img src="images/topics/ssri.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>SSRIs &amp; SNRIs</span></a></li>
+    <li data-topic="mental"><a href="#medications" data-match="myths vs studies"><img src="images/topics/evidence.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>Antidepressant evidence</span></a></li>
+    <li data-topic="leadership"><a href="#leadership" data-match="expertise around"><img src="images/topics/leadership.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>Clinical leadership</span></a></li>
+    <li data-topic="leadership"><a href="#leadership" data-match="retain senior"><img src="images/topics/retain.jpg" alt="" width="96" height="96" loading="lazy" decoding="async"><span>Retaining senior clinicians</span></a></li>
   </ul>
 </div>
 

@@ -544,6 +544,13 @@
     .btn-youtube, .nav-cta.btn-youtube, #subscribe-cta .btn-youtube { background: #E00000; color: #fff !important; border-color: transparent; }
     .btn-youtube svg, .nav-cta.btn-youtube svg { width: 22px; height: 22px; fill: #fff; }
     .btn-youtube:hover, .nav-cta.btn-youtube:hover { background: #C40000; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(224,0,0,.35); }
+    /* Filter pills carry their topic picture instead of a dot */
+    .pill:has(img) { padding: .3rem .95rem .3rem .3rem; }
+    .pill img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: var(--bg); flex-shrink: 0;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--tc) 60%, transparent); transition: transform .25s; }
+    .pill:hover img { transform: scale(1.1) rotate(-4deg); }
+    .pill[aria-pressed="true"] img { box-shadow: 0 0 0 2px var(--dark-text); }
+    .pill[data-filter]:not([data-filter="all"]):has(img)::before { display: none; }
   </style>
   <script>
     // Opt into motion before first paint so revealed content never flashes.
@@ -853,11 +860,11 @@
   // Drug-class tags are inferred from each title, so new episodes need no extra
   // field — first match wins; anything unmatched is tagged "More".
   const TOPICS = [
-    { key: 'cardio',      label: 'Cardiovascular',    match: /calcium channel|statin|beta.?blocker|ace inhibitor|anticoagul/i },
-    { key: 'antibiotics', label: 'Antibiotics',       match: /penicillin|macrolide|antibiotic/i },
-    { key: 'metabolic',   label: 'Diabetes & weight', match: /glp-1|sglt2|diabetes|insulin|metformin|weight/i },
-    { key: 'neuro',       label: 'Neurology',         match: /careldopa|parkinson|epilep|migraine/i },
-    { key: 'mental',      label: 'Mental health',     match: /ssri|snri|antidepress|anxiety/i }
+    { key: 'cardio',      label: 'Cardiovascular',    img: 'ccb', match: /calcium channel|statin|beta.?blocker|ace inhibitor|anticoagul/i },
+    { key: 'antibiotics', label: 'Antibiotics',       img: 'macrolides', match: /penicillin|macrolide|antibiotic/i },
+    { key: 'metabolic',   label: 'Diabetes & weight', img: 'glp1', match: /glp-1|sglt2|diabetes|insulin|metformin|weight/i },
+    { key: 'neuro',       label: 'Neurology',         img: 'careldopa', match: /careldopa|parkinson|epilep|migraine/i },
+    { key: 'mental',      label: 'Mental health',     img: 'ssri', match: /ssri|snri|antidepress|anxiety/i }
   ];
   const topicFor = title => TOPICS.find(t => t.match.test(title)) || { key: 'more', label: 'More' };
 
@@ -892,7 +899,7 @@
       .filter(t => t.key === 'all' || counts[t.key]);
     wrap.innerHTML = pills.map(t => `
       <button type="button" class="pill" data-filter="${t.key}" aria-pressed="${t.key === 'all'}">
-        ${t.label}<span class="pill-count">${t.key === 'all' ? cards.length : counts[t.key]}</span>
+        ${t.img ? `<img src="images/topics/${t.img}.jpg" alt="" width="34" height="34" loading="lazy" decoding="async">` : ''}${t.label}<span class="pill-count">${t.key === 'all' ? cards.length : counts[t.key]}</span>
       </button>`).join('');
     // Gliding filter (FLIP): leaving cards fade out, staying cards slide to
     // their new slot, arriving cards fade in. Cards are hidden, never removed,

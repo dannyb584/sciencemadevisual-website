@@ -551,6 +551,19 @@
     .pill:hover img { transform: scale(1.1) rotate(-4deg); }
     .pill[aria-pressed="true"] img { box-shadow: 0 0 0 2px var(--dark-text); }
     .pill[data-filter]:not([data-filter="all"]):has(img)::before { display: none; }
+    /* Animated capsules beside the section headings (added by script) */
+    .caps { display: inline-flex; align-items: center; gap: .3em; margin-left: .3em; vertical-align: middle; position: relative; top: -.08em; }
+    .caps svg { width: 1.5em; height: auto; overflow: visible; filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
+    .caps svg.tab { width: .68em; }
+    .caps svg.sm { width: 1.05em; }
+    @media (prefers-reduced-motion: no-preference) {
+      .motion .caps svg { animation: capsule-bob 3.4s ease-in-out infinite; transform-origin: 50% 50%; animation-delay: calc(var(--d, 0) * -1.1s); }
+      .motion .caps svg.tab { animation-name: tablet-spin; animation-duration: 5s; }
+      .motion .section-title:hover .caps svg { animation: capsule-flip .9s cubic-bezier(.3,1.4,.5,1) 1; }
+      @keyframes capsule-bob { 0%, 100% { transform: translateY(0) rotate(-22deg); } 50% { transform: translateY(-.18em) rotate(14deg); } }
+      @keyframes tablet-spin { 0% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-.25em) rotate(180deg); } 100% { transform: translateY(0) rotate(360deg); } }
+      @keyframes capsule-flip { to { transform: rotate(360deg) scale(1.15); } }
+    }
   </style>
   <script>
     // Opt into motion before first paint so revealed content never flashes.
@@ -1009,6 +1022,18 @@
 
   // ── Engagement layer (see the CSS block of the same name) ──
   const motion = document.documentElement.classList.contains('motion');
+
+  // Capsules beside each section heading: two-tone pills in the topic colours
+  (() => {
+    const tone = ['--t-cardio', '--t-antibiotics', '--t-metabolic', '--t-neuro', '--t-mental', '--t-leadership'];
+    const cap = (c, d, cls = '') => `<svg class="${cls}" style="--d:${d}" viewBox="0 0 44 18" aria-hidden="true"><path d="M9 1h13v16H9a8 8 0 0 1 0-16z" fill="var(${c})"/><path d="M22 1h13a8 8 0 0 1 0 16H22z" fill="#F1FAFA"/><rect x="7" y="4" width="28" height="2.6" rx="1.3" fill="#fff" opacity=".5"/></svg>`;
+    const tab = (c, d) => `<svg class="tab" style="--d:${d}" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="var(${c})"/><path d="M3 10h14" stroke="rgba(7,39,45,.45)" stroke-width="1.6" stroke-linecap="round"/><circle cx="7" cy="6.5" r="2" fill="#fff" opacity=".45"/></svg>`;
+    document.querySelectorAll('.section-title').forEach((h, i) => {
+      const a = tone[i % tone.length], b = tone[(i + 2) % tone.length], c = tone[(i + 4) % tone.length];
+      const html = i === 0 ? cap(a, 0) + tab(b, 1) + cap(c, 2, 'sm') : cap(a, i) + tab(b, i + 1);
+      h.insertAdjacentHTML('beforeend', `<span class="caps" aria-hidden="true">${html}</span>`);
+    });
+  })();
 
   // Episode counter: total comes from SERIES, counts up once on load
   const counter = document.getElementById('episodeCount');

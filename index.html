@@ -216,6 +216,7 @@
     /* ── SHOP ─────────────────────────────────────────────── */
     #shop { background: var(--bg); }
     .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.75rem; }
+    .shop-grid[hidden] { display: none; }
     .product-card {
       background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
       overflow: hidden; box-shadow: var(--shadow); transition: transform .3s, box-shadow .3s, background .3s;
@@ -995,54 +996,21 @@
   }
   renderFilters();
 
-  // ── Lunchbox Designs products — Etsy shop ──
-  const PRODUCTS = [
-    {
-      url: 'https://www.etsy.com/uk/listing/4575779289/placebo-giant-small-combo-capsule-pot',
-      image: 'https://i.etsystatic.com/61341660/r/il/856744/8574482811/il_570xN.8574482811_q17p.jpg',
-      title: 'PLACEBO Capsule Pot Combo Set — Large + Small Gift Set',
-      price: '£40.00'
-    },
-    {
-      url: 'https://www.etsy.com/uk/listing/4575796550/placebo-capsule-storage-pot-screw',
-      image: 'https://i.etsystatic.com/61341660/r/il/856744/8574482811/il_570xN.8574482811_q17p.jpg',
-      title: 'PLACEBO Capsule Storage Pot — Pharmacist Gift',
-      price: '£17.50'
-    },
-    {
-      url: 'https://www.etsy.com/uk/listing/4575774559/placebo-giant-capsule-pot-large-216mm',
-      image: 'https://i.etsystatic.com/61341660/r/il/856744/8574482811/il_570xN.8574482811_q17p.jpg',
-      title: 'GIANT PLACEBO Capsule Pot — Large 216mm Trinket Box',
-      price: '£25.00'
-    },
-    {
-      url: 'https://www.etsy.com/uk/listing/4542111004/honeycomb-phone-stand-geometric-hexagon',
-      image: 'https://i.etsystatic.com/61341660/r/il/4cb9d4/8331957291/il_570xN.8331957291_2uk3.jpg',
-      title: 'Honeycomb Phone Stand — Geometric Hexagon Desk Stand',
-      price: '£7.99'
-    },
-    {
-      url: 'https://www.etsy.com/uk/listing/4367028496/large-ribbed-vase-3d-printer-stl-file',
-      image: 'https://i.etsystatic.com/61341660/r/il/bd793e/7235023923/il_570xN.7235023923_6326.jpg',
-      title: 'Large Ribbed Vase — 3D Printer STL File',
-      price: '£4.20'
-    },
-    {
-      url: 'https://www.etsy.com/uk/listing/4367018827/desktop-t-rex-skull-digital-stl-file',
-      image: 'https://i.etsystatic.com/61341660/r/il/5b3850/7234937377/il_570xN.7234937377_1lw1.jpg',
-      title: 'Desktop T-Rex Skull — Digital STL File',
-      price: '£4.19'
-    }
-  ];
+  // ── Lunchbox Designs products: one feed for this grid and the SMV Pharmacology app ──
+  // The list lives in shop/products.json. Add to it with scripts/add_shop_product.py.
+  const SITE_ROOT = 'https://www.sciencemadevisual.co.uk/';
+  const escapeHTML = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // Our own images load from this copy of the site, so a local preview shows them too
+  const ownImage = src => src.startsWith(SITE_ROOT) ? src.slice(SITE_ROOT.length) : src;
 
-  function renderShop(containerId, products) {
-    const el = document.getElementById(containerId);
+  function renderShop(el, products) {
     el.innerHTML = products.map(p => `
-      <a class="product-card" href="${p.url}" target="_blank" rel="noopener">
-        <div class="product-image"><span class="chip product-badge">${/STL/i.test(p.title) ? 'STL file' : '3D printed'}</span><img src="${p.image}" alt="${p.title}" loading="lazy" /></div>
+      <a class="product-card" href="${escapeHTML(p.url)}" target="_blank" rel="noopener">
+        <div class="product-image"><span class="chip product-badge">${/STL/i.test(p.title) ? 'STL file' : '3D printed'}</span><img src="${escapeHTML(ownImage(p.image))}" alt="${escapeHTML(p.title)}" loading="lazy" decoding="async" /></div>
         <div class="product-info">
-          <div class="product-title">${p.title}</div>
-          <div class="product-price">${p.price}</div>
+          <div class="product-title">${escapeHTML(p.title)}</div>
+          <div class="product-price">${escapeHTML(p.price)}</div>
           <span class="product-link">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zM5 5h5V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-5h-2v5H5V5z"/></svg>
             View on Etsy
@@ -1051,7 +1019,18 @@
       </a>
     `).join('');
   }
-  renderShop('shopGrid', PRODUCTS);
+
+  // If the feed cannot load, hide the grid and leave the "Visit the Etsy shop" button
+  const shopGrid = document.getElementById('shopGrid');
+  const shopReady = fetch('shop/products.json', { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error(`shop feed ${r.status}`); return r.json(); })
+    .then(feed => {
+      const products = (feed && Array.isArray(feed.products) ? feed.products : [])
+        .filter(p => p && typeof p.url === 'string' && /^https:\/\//.test(p.url) && p.title && typeof p.image === 'string');
+      if (!products.length) throw new Error('shop feed is empty');
+      renderShop(shopGrid, products);
+    })
+    .catch(() => { shopGrid.innerHTML = ''; shopGrid.hidden = true; });
 
   // ── Engagement layer (see the CSS block of the same name) ──
   const motion = document.documentElement.classList.contains('motion');
@@ -1221,7 +1200,7 @@
       '.section-inner > .section-tag, .section-inner > .section-title, .section-inner > .section-subtitle, .section-inner > .filter-pills',
       '.about-grid > div > .section-tag, .about-grid > div > .section-title, .about-grid > div > .section-subtitle',
       '.contact-grid > div > .section-tag, .contact-grid > div > .section-title, .contact-grid > div > .section-subtitle',
-      '#medicationsGrid > .short-card', '#leadershipGrid > .short-card', '#shopGrid > .product-card',
+      '#medicationsGrid > .short-card', '#leadershipGrid > .short-card',
       '.about-facts > li', '.contact-perks > li', '.about-quote, .contact-form',
       '.series-cta', '.tiktok-feature-head, .tiktok-embeds', '#subscribe-cta .section-inner > *'
     ];
@@ -1232,7 +1211,7 @@
       // Hand control back to the element's own hover transitions once revealed
       e.target.addEventListener('transitionend', () => e.target.removeAttribute('data-reveal'), { once: true });
     }), { rootMargin: '0px 0px -8% 0px', threshold: .12 });
-    groups.forEach(sel => {
+    const revealGroup = sel => {
       const byParent = new Map();
       document.querySelectorAll(sel).forEach(el => {
         const i = byParent.get(el.parentElement) || 0;
@@ -1241,7 +1220,10 @@
         el.style.setProperty('--i', Math.min(i, 8));
         io.observe(el);
       });
-    });
+    };
+    groups.forEach(revealGroup);
+    // Shop cards arrive from shop/products.json after the page has loaded
+    shopReady.then(() => revealGroup('#shopGrid > .product-card'));
   }
 
   // Cursor-following spotlight on cards

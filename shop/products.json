@@ -1,6 +1,14 @@
 {
-  "updated": "2026-11-16",
+  "updated": "2026-11-20",
   "products": [
+    {
+      "id": "capsule-coasters",
+      "title": "Capsule Coasters",
+      "price": "£14.99",
+      "url": "https://www.etsy.com/uk/listing/4621802281/capsule-coasters-set-of-4-pill-coasters",
+      "image": "https://www.sciencemadevisual.co.uk/images/shop/capsule-coasters.jpg",
+      "added": "2026-11-20"
+    },
     {
       "id": "tablet-transporter",
       "title": "Tablet Transporter: Giant Tablet 7-Day Pill Box",
